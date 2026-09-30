@@ -66,6 +66,20 @@ docs/
   known-limitations.md  # What v1 intentionally does not do
 ```
 
+## Deploy (Vercel + Supabase)
+
+1. Push `main` to GitHub (already done if you can see this repo).
+2. In [vercel.com](https://vercel.com) → **Add New → Project** → import `mi-lana`. Framework is auto-detected (Next.js); no config file needed.
+3. Add the environment variables from `.env.local.example`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+4. Deploy.
+5. Back in the Supabase dashboard → **Authentication → URL Configuration**:
+   - **Site URL**: `https://<your-app>.vercel.app`
+   - **Redirect URLs**: add `https://<your-app>.vercel.app/auth/confirm` (keep `http://localhost:3000/auth/confirm` for local dev)
+
+Magic links now land on the production deployment. The same hosted Supabase project serves both dev and prod — if you ever want isolation, create a second Supabase project and point Vercel at it.
+
 ## Documentation
 
 - **Humans:** start here, then `docs/use-cases.md` and `docs/user-flows.md`
