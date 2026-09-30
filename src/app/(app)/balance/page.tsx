@@ -56,7 +56,7 @@ export default async function BalancePage() {
               gastos compartidos.
             </p>
           ) : balanceCents === 0 ? (
-            <p className="text-2xl font-semibold">Están a mano 🎉</p>
+            <p className="text-2xl font-semibold">Están a mano</p>
           ) : (
             <>
               <p className="text-2xl font-semibold">

@@ -278,7 +278,7 @@ export default async function DashboardPage() {
                       <li key={tx.id}>
                         <Card>
                           <CardContent className="flex items-center justify-between gap-4 py-3">
-                            <div className="flex items-center gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
                               <span
                                 aria-hidden
                                 className="size-3 shrink-0 rounded-full"
@@ -289,8 +289,8 @@ export default async function DashboardPage() {
                                       : "#16a34a",
                                 }}
                               />
-                              <div>
-                                <p className="font-medium">
+                              <div className="min-w-0">
+                                <p className="truncate font-medium">
                                   {tx.description ||
                                     category?.name ||
                                     source?.name ||
@@ -308,7 +308,7 @@ export default async function DashboardPage() {
                               </div>
                             </div>
                             <p
-                              className={`font-semibold whitespace-nowrap tabular-nums ${
+                              className={`shrink-0 font-semibold whitespace-nowrap tabular-nums ${
                                 tx.type === "spend"
                                   ? "text-destructive"
                                   : "text-green-600 dark:text-green-500"
