@@ -24,6 +24,8 @@ Expense tracker for a couple (shared household). UI in **Spanish**, docs/code in
 
 - **Conventional Commits**: `feat:`, `fix:`, `chore:`, `docs:` (scopes optional, e.g. `feat(db):`)
 - **Atomic commits**: one logical change per commit; the app must work at every commit
+- **Branches**: `main` is the integration branch. All new work happens on feature branches (`feat/...`, `fix/...`, `chore/...`) and merges back to `main` with `--no-ff`
+- **Plan checkboxes**: tick `docs/plans/NNN-*.md` items in the same commit as the work they describe
 - **Rollback**: prefer `git revert <sha>`; never rewrite pushed history
 - Milestones get tags (e.g. `v0.1-mvp`)
 
