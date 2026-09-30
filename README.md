@@ -29,7 +29,7 @@ cp .env.local.example .env.local
 Then create the Supabase project (~5 min):
 
 1. Go to [supabase.com](https://supabase.com) → sign up → **New project** (pick a region close to you)
-2. In **Project Settings → API**, copy the **Project URL** and **anon public** key into `.env.local`
+2. In **Project Settings → API Keys**, copy the **Project URL** and the **publishable** key (`sb_publishable_...`) into `.env.local`
 3. Apply the database migrations: open **SQL Editor** in the dashboard and run the files in `supabase/migrations/` in order
 4. In **Authentication → Sign In / Providers**, make sure **Email** is enabled (magic link)
 
