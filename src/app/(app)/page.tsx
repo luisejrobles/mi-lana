@@ -5,6 +5,7 @@ import { es } from "date-fns/locale";
 import { ChevronDown } from "lucide-react";
 import { getMembership } from "@/lib/household";
 import { createClient } from "@/lib/supabase/server";
+import { formatShortDate } from "@/lib/dates";
 import { formatMoney, formatSigned } from "@/lib/money";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +34,7 @@ export default async function DashboardPage() {
     { data: monthTransactions },
     { data: chartTransactions },
     { data: categories },
+    { data: registry },
   ] = await Promise.all([
     supabase
       .from("transactions")
@@ -48,6 +50,13 @@ export default async function DashboardPage() {
       .from("categories")
       .select("id, name, color, budgets(amount_cents, currency)")
       .eq("archived", false),
+    supabase
+      .from("transactions")
+      .select(
+        "id, type, date, description, amount_cents, currency, categories(name, color), payment_methods(name), income_sources(name)",
+      )
+      .order("date", { ascending: false })
+      .limit(500),
   ]);
 
   let spentCents = 0;
@@ -113,6 +122,15 @@ export default async function DashboardPage() {
   }
 
   const monthLabel = format(now, "MMMM yyyy", { locale: es });
+
+  // Registry grouped by month of registration (spec UC-13), newest first.
+  const registryGroups = new Map<string, NonNullable<typeof registry>>();
+  for (const tx of registry ?? []) {
+    const key = tx.date.slice(0, 7); // yyyy-MM
+    const group = registryGroups.get(key);
+    if (group) group.push(tx);
+    else registryGroups.set(key, [tx]);
+  }
 
   return (
     <section className="flex flex-col gap-6">
@@ -226,6 +244,89 @@ export default async function DashboardPage() {
           </CollapsibleContent>
         </Card>
       </Collapsible>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Registros</h2>
+        {registryGroups.size === 0 ? (
+          <p className="text-sm text-muted-foreground">
+            Aún no hay registros. Empieza con el botón “Registrar”.
+          </p>
+        ) : (
+          [...registryGroups.entries()].map(([monthKey, transactions]) => {
+            const groupLabel = format(
+              new Date(`${monthKey}-01T00:00:00`),
+              "MMMM yyyy",
+              { locale: es },
+            );
+            return (
+              <div key={monthKey} className="flex flex-col gap-2">
+                <h3 className="text-sm font-medium text-muted-foreground capitalize">
+                  {groupLabel}
+                </h3>
+                <ul className="flex flex-col gap-2">
+                  {transactions.map((tx) => {
+                    const category = Array.isArray(tx.categories)
+                      ? tx.categories[0]
+                      : tx.categories;
+                    const paymentMethod = Array.isArray(tx.payment_methods)
+                      ? tx.payment_methods[0]
+                      : tx.payment_methods;
+                    const source = Array.isArray(tx.income_sources)
+                      ? tx.income_sources[0]
+                      : tx.income_sources;
+                    return (
+                      <li key={tx.id}>
+                        <Card>
+                          <CardContent className="flex items-center justify-between gap-4 py-3">
+                            <div className="flex items-center gap-3">
+                              <span
+                                aria-hidden
+                                className="size-3 shrink-0 rounded-full"
+                                style={{
+                                  backgroundColor:
+                                    tx.type === "spend"
+                                      ? (category?.color ?? "#a3a3a3")
+                                      : "#16a34a",
+                                }}
+                              />
+                              <div>
+                                <p className="font-medium">
+                                  {tx.description ||
+                                    category?.name ||
+                                    source?.name ||
+                                    "Sin descripción"}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {formatShortDate(tx.date)}
+                                  {tx.type === "spend" && paymentMethod
+                                    ? ` · ${paymentMethod.name}`
+                                    : ""}
+                                  {tx.type === "income" && source
+                                    ? ` · ${source.name}`
+                                    : ""}
+                                </p>
+                              </div>
+                            </div>
+                            <p
+                              className={`font-semibold whitespace-nowrap tabular-nums ${
+                                tx.type === "spend"
+                                  ? "text-destructive"
+                                  : "text-green-600 dark:text-green-500"
+                              }`}
+                            >
+                              {formatSigned(tx.amount_cents, tx.type, tx.currency)}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })
+        )}
+      </section>
     </section>
   );
 }
