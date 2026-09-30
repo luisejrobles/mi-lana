@@ -28,6 +28,9 @@ export default async function AppLayout({
               <Link href="/categories" className="hover:text-foreground">
                 Categorías
               </Link>
+              <Link href="/payment-methods" className="hover:text-foreground">
+                Pagos
+              </Link>
               <Link href="/settings" className="hover:text-foreground">
                 Ajustes
               </Link>
