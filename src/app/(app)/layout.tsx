@@ -31,6 +31,9 @@ export default async function AppLayout({
               <Link href="/payment-methods" className="hover:text-foreground">
                 Pagos
               </Link>
+              <Link href="/balance" className="hover:text-foreground">
+                Balance
+              </Link>
               <Link href="/settings" className="hover:text-foreground">
                 Ajustes
               </Link>
