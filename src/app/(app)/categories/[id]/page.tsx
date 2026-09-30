@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { getMembership } from "@/lib/household";
 import { createClient } from "@/lib/supabase/server";
 import { formatShortDate } from "@/lib/dates";
-import { formatMoney } from "@/lib/money";
+import { formatSigned } from "@/lib/money";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default async function CategoryDetailPage(
@@ -61,8 +61,8 @@ export default async function CategoryDetailPage(
               <li key={tx.id}>
                 <Card>
                   <CardContent className="flex items-center justify-between gap-4 py-3">
-                    <div>
-                      <p className="font-medium">
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">
                         {tx.description || "Sin descripción"}
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -70,8 +70,8 @@ export default async function CategoryDetailPage(
                         {paymentMethod ? ` · ${paymentMethod.name}` : ""}
                       </p>
                     </div>
-                    <p className="font-semibold tabular-nums text-destructive">
-                      - {formatMoney(tx.amount_cents, tx.currency)}
+                    <p className="shrink-0 font-semibold tabular-nums text-destructive">
+                      {formatSigned(tx.amount_cents, "spend", tx.currency)}
                     </p>
                   </CardContent>
                 </Card>
