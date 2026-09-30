@@ -139,7 +139,9 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-semibold">Resumen</h1>
           <p className="text-sm text-muted-foreground capitalize">{monthLabel}</p>
         </div>
-        <Button render={<Link href="/transactions/new" />}>Registrar</Button>
+        <Button nativeButton={false} render={<Link href="/transactions/new" />}>
+          Registrar
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
