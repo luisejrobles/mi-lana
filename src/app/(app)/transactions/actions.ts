@@ -94,3 +94,66 @@ export async function createSpend(
   revalidatePath("/");
   redirect("/");
 }
+
+const incomeSchema = z.object({
+  amount: z.string().trim().min(1, "El monto es obligatorio"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida"),
+  description: z.string().trim().max(200),
+  income_source_id: z.string().uuid("Elige una fuente"),
+});
+
+export type IncomeFormState = { error: string | null };
+
+export async function createIncome(
+  _prev: IncomeFormState,
+  formData: FormData,
+): Promise<IncomeFormState> {
+  const parsed = incomeSchema.safeParse({
+    amount: formData.get("amount"),
+    date: formData.get("date"),
+    description: formData.get("description") ?? "",
+    income_source_id: formData.get("income_source_id"),
+  });
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Datos inválidos" };
+  }
+
+  const amountCents = pesosToCents(parsed.data.amount);
+  if (amountCents === null || amountCents <= 0) {
+    return { error: "Monto inválido" };
+  }
+
+  const membership = await getMembership();
+  if (!membership) throw new Error("Sin hogar");
+  const supabase = await createClient();
+
+  const { data: source } = await supabase
+    .from("income_sources")
+    .select("id")
+    .eq("id", parsed.data.income_source_id)
+    .maybeSingle();
+  if (!source) {
+    return { error: "Fuente de ingreso inválida" };
+  }
+
+  const { error } = await supabase.from("transactions").insert({
+    household_id: membership.household_id,
+    type: "income",
+    amount_cents: amountCents,
+    currency: "MXN",
+    date: parsed.data.date,
+    description: parsed.data.description,
+    income_source_id: parsed.data.income_source_id,
+    paid_by: membership.user_id,
+    is_shared: false,
+    payer_share_pct: null,
+    created_by: membership.user_id,
+  });
+
+  if (error) {
+    return { error: "No se pudo registrar el ingreso" };
+  }
+
+  revalidatePath("/");
+  redirect("/");
+}
