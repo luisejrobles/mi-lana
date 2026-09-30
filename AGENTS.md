@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Expense tracker for a couple (shared household). UI in **Spanish**, docs/code in English, amounts in **MXN** by default.
 
-**Active plan:** [`docs/plans/001-mvp.md`](./docs/plans/001-mvp.md) — resume from the first unchecked commit.
+**Active plan:** none — [`docs/plans/001-mvp.md`](./docs/plans/001-mvp.md) is **done** (tag `v0.1-mvp`). Start the next iteration as `docs/plans/002-<slug>.md` per the conventions below.
 
 ## Commands
 
