@@ -68,17 +68,16 @@ docs/
 
 ## Deploy (Vercel + Supabase)
 
-1. Push `main` to GitHub (already done if you can see this repo).
-2. In [vercel.com](https://vercel.com) → **Add New → Project** → import `mi-lana`. Framework is auto-detected (Next.js); no config file needed.
-3. Add the environment variables from `.env.local.example`:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-4. Deploy.
-5. Back in the Supabase dashboard → **Authentication → URL Configuration**:
-   - **Site URL**: `https://<your-app>.vercel.app`
-   - **Redirect URLs**: add `https://<your-app>.vercel.app/auth/confirm` (keep `http://localhost:3000/auth/confirm` for local dev)
+**Production: <https://mi-lana-alpha.vercel.app>** — deploys run automatically on every push to `main` (GitHub integration); feature branches get preview URLs (protected by Vercel SSO — only you can open them).
 
-Magic links now land on the production deployment. The same hosted Supabase project serves both dev and prod — if you ever want isolation, create a second Supabase project and point Vercel at it.
+Manual CLI deploys also work: `vercel --prod` (project `mi-lana` under `luisejrobles-projects`, linked in `.vercel/`).
+
+One-time Supabase step for production auth — **Authentication → URL Configuration**:
+
+- **Site URL**: `https://mi-lana-alpha.vercel.app`
+- **Redirect URLs**: add `https://mi-lana-alpha.vercel.app/auth/confirm` (keep `http://localhost:3000/auth/confirm` for local dev)
+
+Env vars (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) are already set for Production and Preview via `vercel env`. The same hosted Supabase project serves dev and prod — if you ever want isolation, create a second Supabase project and point Vercel at it.
 
 ## Documentation
 
