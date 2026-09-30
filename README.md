@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mi Lana
 
-## Getting Started
+**Mi Lana** is a web app to track your expenses — and the ones you share with your partner. Register spends and income, assign budgets per category, track card payment due dates, split shared expenses, and settle up at the end of the month.
 
-First, run the development server:
+UI is in **Spanish**; amounts default to **MXN** (multi-currency ready).
+
+## Stack
+
+- **Next.js 16** (App Router, TypeScript, Turbopack) — see `node_modules/next/dist/docs/` for version-matched docs
+- **Supabase** (Postgres + Auth with magic links + Row Level Security)
+- **Tailwind CSS 4 + shadcn/ui** — components in `src/components/ui/`
+- **Recharts** — income vs spending chart
+- **react-hook-form + zod** — forms and validation
+- **date-fns** — date handling (`es` locale)
+
+## Prerequisites
+
+- **Node.js 20+** (`nvm use` reads `.nvmrc`)
+- A free **Supabase** project — create one when you reach the setup step below (no account needed to clone and explore)
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use                 # Node 20
+npm install
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then create the Supabase project (~5 min):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Go to [supabase.com](https://supabase.com) → sign up → **New project** (pick a region close to you)
+2. In **Project Settings → API**, copy the **Project URL** and **anon public** key into `.env.local`
+3. Apply the database migrations: open **SQL Editor** in the dashboard and run the files in `supabase/migrations/` in order
+4. In **Authentication → Sign In / Providers**, make sure **Email** is enabled (magic link)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev             # http://localhost:3000
+```
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command         | What it does                        |
+| --------------- | ----------------------------------- |
+| `npm run dev`   | Dev server (Turbopack)              |
+| `npm run build` | Production build — must stay green  |
+| `npm run start` | Serve the production build          |
+| `npm run lint`  | ESLint                              |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/                  # App Router pages (dashboard, categories, ...)
+  components/ui/        # shadcn/ui components
+  lib/
+    supabase/           # browser/server/proxy Supabase clients
+    utils.ts            # cn() and shared helpers
+  proxy.ts              # Next 16 "proxy" (was middleware): session refresh
+supabase/
+  migrations/           # SQL, applied in order via Supabase SQL editor
+docs/
+  plans/                # Numbered iteration plans (001-mvp.md, ...)
+  decisions.md          # ADR-style record of the "why"
+  use-cases.md          # What the app supports
+  user-flows.md         # Step-by-step flows
+  known-limitations.md  # What v1 intentionally does not do
+```
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Humans:** start here, then `docs/use-cases.md` and `docs/user-flows.md`
+- **Agents/contributors:** read [`AGENTS.md`](./AGENTS.md) first — it holds the commit conventions, plan versioning, and architecture map. Active plan: `docs/plans/001-mvp.md`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Rollback cheat sheet
+
+Every feature lands as an atomic commit (see `git log`). To undo:
+
+| Situation                    | Command                  |
+| ---------------------------- | ------------------------ |
+| Undo a commit safely         | `git revert <sha>`       |
+| Discard uncommitted changes  | `git restore .`          |
+| Inspect a past milestone     | `git checkout v0.1-mvp`  |
+| Nuclear reset (local only)   | `git reset --hard <sha>` |
+
+Prefer `revert` — it keeps history intact and never rewrites shared work.
