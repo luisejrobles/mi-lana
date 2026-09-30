@@ -18,3 +18,13 @@ export function pesosToCents(value: string): number | null {
 export function centsToPesos(cents: number): string {
   return (cents / 100).toFixed(2);
 }
+
+// Spec format: "- $1,234.56 MXN" for spends, "+ $1,234.56 MXN" for income.
+export function formatSigned(
+  cents: number,
+  type: "spend" | "income",
+  currency = "MXN",
+): string {
+  const sign = type === "spend" ? "-" : "+";
+  return `${sign} ${formatMoney(cents, currency)} ${currency}`;
+}
